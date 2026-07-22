@@ -63,8 +63,51 @@ Required-Reason APIs. A ready-to-copy manifest lives in the SDK source at
 
 ## Example app
 
-A Compose Multiplatform sample lives in [`composeApp/`](composeApp).
-A native Android sample is at https://github.com/binoban/binoban-example-android.
+A **Compose Multiplatform** sample lives in [`composeApp/`](composeApp) — one
+shared UI running on **both Android and iOS**, wired to this SDK. It's the
+quickest way to see the client APIs end to end.
+
+| Feature | What it shows |
+|---|---|
+| **Track** | Send a named event with custom key-value properties |
+| **Identify** | Identify a user by ID with custom traits |
+| **Flush** | Immediately dispatch buffered events to the server |
+| **Reset** | Clear the current identity and reset SDK state |
+| **Settings** | Toggle debug logs / enable the SDK, adjust flush thresholds at runtime, and read back config (API host, anonymous ID, …) |
+| **JSON preview** | See the exact payload for each call |
+
+**Layout**
+
+- `composeApp/src/commonMain` — the shared UI (the whole demo lives here)
+- `composeApp/src/androidMain` — Android `Application` + `Activity` entry point
+- `composeApp/src/iosMain` — iOS `MainViewController` entry point
+- `iosApp/` — the Xcode project that hosts the shared UI on iOS
+
+**Set your credentials** (from Binoban support — `support@binoban.io`) in both
+platform entry points, replacing the placeholders:
+
+- Android — `composeApp/src/androidMain/kotlin/io/binoban/sdk/demo/kmp/MainApplication.kt`
+- iOS — `composeApp/src/iosMain/kotlin/io/binoban/sdk/demo/kmp/MainViewController.kt`
+
+```kotlin
+Binoban("YOUR_API_KEY", "YOUR_SOURCE_IDENTIFIER") {
+    apiHost = "YOUR_API_HOST"
+}
+```
+
+**Run it**
+
+- **Android** — open the project in Android Studio and run the `composeApp`
+  configuration (or `./gradlew :composeApp:installDebug`).
+- **iOS** — open `iosApp/iosApp.xcodeproj` in Xcode, set your signing team, and run.
+
+> Until `io.binoban.sdk:sdk:1.0.0` is on Maven Central, resolve it locally: run
+> `./gradlew :sdk:publishToMavenLocal` in the SDK project — the sample's
+> `settings.gradle.kts` already includes `mavenLocal()`.
+
+A **native Android** sample (single-platform) is at
+https://github.com/binoban/binoban-example-android, and a **native iOS**
+(Swift/SwiftUI) sample at https://github.com/binoban/binoban-example-ios.
 
 ## Links
 

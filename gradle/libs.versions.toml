@@ -1,0 +1,28 @@
+[versions]
+agp = "8.9.3"
+kotlin = "2.1.21"
+compose-multiplatform = "1.8.0"
+androidx-activityCompose = "1.10.1"
+kotlinx-serialization = "1.8.1"
+
+# The Binoban Kotlin Multiplatform SDK. Published to Maven Central as
+# `io.binoban.sdk:sdk`; Gradle module metadata resolves the Android and iOS
+# variants automatically for each target.
+binoban = "1.0.0"
+
+android-compileSdk = "35"
+android-minSdk = "24"
+android-targetSdk = "35"
+
+[libraries]
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+binoban = { module = "io.binoban.sdk:sdk", version.ref = "binoban" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
