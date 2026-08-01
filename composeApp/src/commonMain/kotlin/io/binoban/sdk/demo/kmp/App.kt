@@ -78,11 +78,11 @@ private val prettyJson = Json { prettyPrint = true }
  * Receives the already-configured [Binoban] instance created per platform.
  */
 @Composable
-fun App(analytics: Binoban) {
+fun App(binoban: Binoban) {
     MaterialTheme(colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors) {
         Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
             MainScreen(
-                analytics = analytics,
+                binoban = binoban,
                 modifier = Modifier.padding(padding)
             )
         }
@@ -90,7 +90,7 @@ fun App(analytics: Binoban) {
 }
 
 @Composable
-fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
+fun MainScreen(binoban: Binoban, modifier: Modifier = Modifier) {
     var selectedTab by remember { mutableStateOf(DemoTab.TRACK) }
     var eventName by remember { mutableStateOf("") }
     val fields = remember { mutableStateListOf<Field>() }
@@ -98,9 +98,9 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
     var lastEventJson by remember { mutableStateOf("") }
 
     var debugLogs by remember { mutableStateOf(Binoban.debugLogsEnabled) }
-    var sdkEnabled by remember { mutableStateOf(analytics.enabled) }
-    var flushAt by remember { mutableIntStateOf(analytics.configuration.flushAt) }
-    var flushInterval by remember { mutableIntStateOf(analytics.configuration.flushInterval) }
+    var sdkEnabled by remember { mutableStateOf(binoban.enabled) }
+    var flushAt by remember { mutableIntStateOf(binoban.configuration.flushAt) }
+    var flushInterval by remember { mutableIntStateOf(binoban.configuration.flushInterval) }
 
     Column(
         modifier = modifier
@@ -128,9 +128,9 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
                         .clickable {
                             if (tab == DemoTab.SETTINGS) {
                                 debugLogs = Binoban.debugLogsEnabled
-                                sdkEnabled = analytics.enabled
-                                flushAt = analytics.configuration.flushAt
-                                flushInterval = analytics.configuration.flushInterval
+                                sdkEnabled = binoban.enabled
+                                flushAt = binoban.configuration.flushAt
+                                flushInterval = binoban.configuration.flushInterval
                             } else {
                                 eventName = ""
                                 fields.clear()
@@ -158,7 +158,7 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
 
         when (selectedTab) {
             DemoTab.SETTINGS -> SettingsPanel(
-                analytics = analytics,
+                binoban = binoban,
                 debugLogs = debugLogs,
                 onDebugLogsChange = {
                     debugLogs = it
@@ -167,20 +167,20 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
                 sdkEnabled = sdkEnabled,
                 onSdkEnabledChange = {
                     sdkEnabled = it
-                    analytics.enabled = it
+                    binoban.enabled = it
                 },
                 flushAt = flushAt,
                 onFlushAtChange = {
                     if (it in 1..200) {
                         flushAt = it
-                        analytics.configuration.flushAt = it
+                        binoban.configuration.flushAt = it
                     }
                 },
                 flushInterval = flushInterval,
                 onFlushIntervalChange = {
                     if (it in 5..600) {
                         flushInterval = it
-                        analytics.configuration.flushInterval = it
+                        binoban.configuration.flushInterval = it
                     }
                 }
             )
@@ -191,8 +191,8 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    OutlinedButton(onClick = { analytics.flush() }) { Text("FLUSH") }
-                    OutlinedButton(onClick = { analytics.reset() }) { Text("RESET") }
+                    OutlinedButton(onClick = { binoban.flush() }) { Text("FLUSH") }
+                    OutlinedButton(onClick = { binoban.reset() }) { Text("RESET") }
                 }
 
                 Spacer(Modifier.height(8.dp))
@@ -265,7 +265,7 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
                         }
                         val payload: JsonObject = when (selectedTab) {
                             DemoTab.TRACK -> {
-                                analytics.track(eventName, props)
+                                binoban.track(eventName, props)
                                 buildJsonObject {
                                     put("type", "track")
                                     put("event", eventName)
@@ -273,7 +273,7 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
                                 }
                             }
                             DemoTab.IDENTIFY -> {
-                                analytics.identify(eventName, props)
+                                binoban.identify(eventName, props)
                                 buildJsonObject {
                                     put("type", "identify")
                                     put("userId", eventName)
@@ -325,7 +325,7 @@ fun MainScreen(analytics: Binoban, modifier: Modifier = Modifier) {
 
 @Composable
 fun SettingsPanel(
-    analytics: Binoban,
+    binoban: Binoban,
     debugLogs: Boolean, onDebugLogsChange: (Boolean) -> Unit,
     sdkEnabled: Boolean, onSdkEnabledChange: (Boolean) -> Unit,
     flushAt: Int, onFlushAtChange: (Int) -> Unit,
@@ -358,10 +358,10 @@ fun SettingsPanel(
 
         SectionHeader("Read-only Info")
 
-        InfoRow("API Host", analytics.configuration.apiHost)
-        InfoRow("Collect Device ID", analytics.configuration.collectDeviceId.toString())
-        InfoRow("Track Lifecycle Events", analytics.configuration.trackApplicationLifecycleEvents.toString())
-        InfoRow("Anonymous ID", analytics.anonymousId())
+        InfoRow("API Host", binoban.configuration.apiHost)
+        InfoRow("Collect Device ID", binoban.configuration.collectDeviceId.toString())
+        InfoRow("Track Lifecycle Events", binoban.configuration.trackApplicationLifecycleEvents.toString())
+        InfoRow("Anonymous ID", binoban.anonymousId())
 
         Spacer(Modifier.height(16.dp))
     }
