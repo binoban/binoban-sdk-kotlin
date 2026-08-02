@@ -19,7 +19,7 @@ Android:
 
 ```kotlin
 dependencies {
-    implementation("io.binoban.sdk:sdk-android:1.0.0")
+    implementation("io.binoban.sdk:sdk-android:1.1.0")
 }
 ```
 
@@ -27,7 +27,7 @@ Kotlin Multiplatform:
 
 ```kotlin
 commonMain.dependencies {
-    implementation("io.binoban.sdk:sdk:1.0.0")
+    implementation("io.binoban.sdk:sdk:1.1.0")
 }
 ```
 
@@ -100,10 +100,6 @@ Binoban("YOUR_API_KEY", "YOUR_SOURCE_IDENTIFIER") {
 - **Android** — open the project in Android Studio and run the `composeApp`
   configuration (or `./gradlew :composeApp:installDebug`).
 - **iOS** — open `iosApp/iosApp.xcodeproj` in Xcode, set your signing team, and run.
-
-> Until `io.binoban.sdk:sdk:1.0.0` is on Maven Central, resolve it locally: run
-> `./gradlew :sdk:publishToMavenLocal` in the SDK project — the sample's
-> `settings.gradle.kts` already includes `mavenLocal()`.
 
 A **native Android** sample (single-platform) is at
 https://github.com/binoban/binoban-example-android, and a **native iOS**

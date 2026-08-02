@@ -4,6 +4,77 @@ All notable changes to the Binoban Kotlin Multiplatform SDK are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 the project aims for **source compatibility** — see *Migration notes*.
 
+## [1.1.0] — 2026-08-02
+
+### Added
+
+- **`BinobanNotifications` — a Swift-facing entry point for notification forwarding.**
+  The forwarding entry points are Kotlin top-level functions, which Kotlin/Native exports
+  as static members of a generated class name (`NotificationForwarding_iosKt`). Swift
+  callers can now use `BinobanNotifications.shared.onNewToken(token:)` and friends instead.
+
+  **Purely additive.** `NotificationForwarding_iosKt` still exports and still works, so no
+  existing iOS integration breaks. Kotlin Multiplatform callers should keep calling the
+  top-level functions unqualified — that spelling is idiomatic in Kotlin and is unchanged.
+  Every member delegates with no added behavior.
+
+- **Android deep-link tracking is now documented.** `AndroidDeepLinkPlugin` has shipped as
+  public API since 1.0.0 but was never registered by default and was never mentioned in the
+  docs, so there was no way to discover it. The Kotlin README now has a *Deep-link tracking
+  (Android)* section. It stays opt-in — `binoban.add(...)` — and is the only part of the SDK
+  that reads `Configuration.application`.
+
+### Changed
+
+- **`AndroidDeeplinkPlugin` renamed to `AndroidDeepLinkPlugin`** and reduced to what it
+  actually does. The old name remains as a deprecated `typealias`, so existing source keeps
+  compiling. Unused internal fields and a lifecycle-observer registration that overrode no
+  callbacks were removed. Deep-link tracking behavior is unchanged.
+
+### Fixed
+
+- **A deep link can no longer spoof its own attribution.** `deep_link_opened` wrote the
+  Android-reported `referrer` before the link's query parameters, so a link ending in
+  `?referrer=...` overwrote the referrer the OS actually reported — letting the link forge
+  the attribution data it was itself being attributed by. Query parameters are now written
+  first and the OS-reported `referrer`/`url` last, so real values win. **This changes
+  emitted payloads** for links carrying a `referrer` parameter. When Android reports no
+  referrer, a `referrer` parameter is still used, which is the normal campaign-tagging case.
+
+- **iOS notification examples in the docs corrected.** They showed unqualified calls and
+  `NotificationPlatformConfiguration.Ios`, neither of which resolves in Swift (the type is
+  exported flat, as `NotificationPlatformConfigurationIos`).
+
+## [1.0.1] — 2026-07-25
+
+### Added
+
+- **`NotificationInteractionManager.drainPendingInteractions()` + an internal replay
+  buffer.** The manager now records recent interactions in a small bounded, lock-free
+  buffer and forwards them through a single `dispatch()` entry point. A consumer that
+  installs its handler *after* an interaction already fired can recover it via
+  `drainPendingInteractions()` (consumed once, delivery-only — tracking already happened).
+  Fixes an **Android cold-start gap**: a tap that launches the app from a killed state is
+  delivered by the notification trampoline during process startup, before a late-attaching
+  UI/JS layer (e.g. the React Native bridge) has called `setHandler`, so it previously
+  never reached that layer. Tracking was always unaffected; this only restores the
+  app-facing delivery of the launching tap. No behavior change for existing consumers.
+
+### Fixed
+
+- **Notification `customData` now reaches the tap handler.** `customData` sent in a push
+  is surfaced on `NotificationInteraction.customData` for click/dismiss (and delivered)
+  interactions on both platforms. It was previously always `null` on the response path:
+  Android dropped the intent extras in the trampoline; iOS never read them back out of
+  `userInfo`. customData is now transported under an internal `binoban_cd_` namespace so
+  it can never collide with SDK-reserved keys or leak FCM/APNs internals.
+- **iOS per-action-button deep links now resolve.** A `UNNotificationAction` carries only
+  an id + title, so each button's target URI is now stashed in `userInfo` (keyed by action
+  id) and resolved by `actionId` on tap. Previously a button tap on iOS always reported the
+  main notification URI regardless of which button was pressed; a body tap is unchanged.
+  As before, the SDK does not itself open URLs on iOS — read `interaction.uri` in a handler
+  and route it (see the README).
+
 ## [1.0.0] — 2026-07-20
 
 **The first stable release.** A focused effort to make the SDK unable to harm a host

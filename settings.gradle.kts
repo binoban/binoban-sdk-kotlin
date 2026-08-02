@@ -24,9 +24,8 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        // The Binoban SDK is resolved from Maven Central once published. Until
-        // then (or to test a local build) run `./gradlew :sdk:publishToMavenLocal`
-        // in the SDK repo and keep mavenLocal() below.
+        // The Binoban SDK resolves from Maven Central. mavenLocal() is kept only so a
+        // locally built SDK (`./gradlew :sdk:publishToMavenLocal`) can be tested here.
         mavenLocal()
     }
 }

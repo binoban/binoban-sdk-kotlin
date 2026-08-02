@@ -8,7 +8,7 @@ kotlinx-serialization = "1.8.1"
 # The Binoban Kotlin Multiplatform SDK. Published to Maven Central as
 # `io.binoban.sdk:sdk`; Gradle module metadata resolves the Android and iOS
 # variants automatically for each target.
-binoban = "1.0.0"
+binoban = "1.1.0"
 
 android-compileSdk = "35"
 android-minSdk = "24"
