@@ -19,7 +19,7 @@ Android:
 
 ```kotlin
 dependencies {
-    implementation("io.binoban.sdk:sdk-android:1.1.0")
+    implementation("io.binoban.sdk:sdk-android:1.3.0")
 }
 ```
 
@@ -27,7 +27,7 @@ Kotlin Multiplatform:
 
 ```kotlin
 commonMain.dependencies {
-    implementation("io.binoban.sdk:sdk:1.1.0")
+    implementation("io.binoban.sdk:sdk:1.3.0")
 }
 ```
 
